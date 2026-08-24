@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --role-primary: #0d9488;
+    --role-primary-light: #f0fdfa;
+    --role-primary-border: #99f6e4;
+    --role-primary-text: #0f766e;
+  }
+
+  [data-cadre="Doctor"] {
+    --role-primary: #2563eb;
+    --role-primary-light: #eff6ff;
+    --role-primary-border: #bfdbfe;
+    --role-primary-text: #1d4ed8;
+  }
+
+  [data-cadre="Physician Assistant"] {
+    --role-primary: #0d9488;
+    --role-primary-light: #f0fdfa;
+    --role-primary-border: #99f6e4;
+    --role-primary-text: #0f766e;
+  }
+
+  [data-cadre="General Nurse"] {
+    --role-primary: #0284c7;
+    --role-primary-light: #f0f9ff;
+    --role-primary-border: #bae6fd;
+    --role-primary-text: #0369a1;
+  }
+
+  [data-cadre="Community Health Nurse"] {
+    --role-primary: #059669;
+    --role-primary-light: #ecfdf5;
+    --role-primary-border: #a7f3d0;
+    --role-primary-text: #047857;
+  }
+
+  [data-cadre="Pharmacist"] {
+    --role-primary: #7c3aed;
+    --role-primary-light: #faf5ff;
+    --role-primary-border: #e9d5ff;
+    --role-primary-text: #6d28d9;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom scrollbars with healthcare polish */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

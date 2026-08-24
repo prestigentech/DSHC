@@ -1,0 +1,114 @@
+{
+  "_comment": "Guideline registry (rationale doc step 2.1 + authority hierarchy). Every clinical chunk in chunks.json carries a document_id that MUST exist here. This file is the single source of provenance and priority. To add a guideline: add its registry entry here, then add its chunks to chunks.json.",
+  "source_priority": {
+    "_comment": "Doc step 11. Higher wins. Priority is applied SECTION-specifically at rerank time, not document-wide: a malaria-programme chunk outranks the STG malaria section, but does not affect UTI retrieval.",
+    "current_disease_specific_national_guideline": 100,
+    "population_specific_national_guideline": 95,
+    "ghana_standard_treatment_guideline": 85,
+    "national_laboratory_guideline": 85,
+    "national_essential_medicines_list": 75,
+    "national_surveillance_guideline": 75,
+    "facility_approved_protocol": 70,
+    "who_gap_filler": 50
+  },
+  "documents": [
+    {
+      "document_id": "GH-STG-2017",
+      "title": "Ghana Standard Treatment Guidelines",
+      "authority": "Ministry of Health, Ghana",
+      "edition": "Seventh edition",
+      "publication_year": 2017,
+      "document_type": "ghana_standard_treatment_guideline",
+      "clinical_scope": "Multiple conditions",
+      "status": "active_pending_confirmation",
+      "effective_from": "2017-01-01",
+      "review_status": "requires_periodic_review",
+      "superseded_sections": [
+        "malaria"
+      ],
+      "source_file": "GHANA-STG-2017.pdf",
+      "source_url": "https://www.moh.gov.gh/wp-content/uploads/2020/07/GHANA-STG-2017-1.pdf"
+    },
+    {
+      "document_id": "GH-MAL-2024",
+      "title": "Ghana Malaria Case Management Guidelines",
+      "authority": "National Malaria Elimination Programme, Ghana Health Service",
+      "edition": "2024",
+      "publication_year": 2024,
+      "document_type": "current_disease_specific_national_guideline",
+      "clinical_scope": "Malaria (classification, diagnosis, uncomplicated/severe, pregnancy, treatment failure)",
+      "status": "active_pending_confirmation",
+      "effective_from": "2024-01-01",
+      "review_status": "current",
+      "superseded_sections": [],
+      "source_file": "GHANA-MALARIA-CM-2024.pdf",
+      "source_url": "https://ghs.gov.gh/resources-hub/policy-documents"
+    },
+    {
+      "document_id": "GH-IMCI",
+      "title": "Ghana Integrated Management of Childhood Illness (chart booklet)",
+      "authority": "Ghana Health Service",
+      "edition": "Ghana-adapted",
+      "publication_year": null,
+      "document_type": "population_specific_national_guideline",
+      "clinical_scope": "Children under five (danger signs, fever, cough/breathing, diarrhoea, measles, anaemia)",
+      "status": "active_pending_confirmation",
+      "effective_from": null,
+      "review_status": "requires_periodic_review",
+      "superseded_sections": [],
+      "source_file": "GHANA-IMCI-CHART-BOOKLET.pdf",
+      "source_url": null,
+      "population_override": {
+        "age_max_years": 5,
+        "note": "For children under five the IMCI workflow normally takes precedence over adult-oriented STG content."
+      }
+    },
+    {
+      "document_id": "GH-EML-2017",
+      "title": "Ghana Essential Medicines List",
+      "authority": "Ministry of Health, Ghana",
+      "edition": "2017",
+      "publication_year": 2017,
+      "document_type": "national_essential_medicines_list",
+      "clinical_scope": "Medicine approval status, level of care, dosage forms/strengths, prescribing restrictions",
+      "status": "active",
+      "effective_from": "2017-07-01",
+      "review_status": "requires_periodic_review",
+      "superseded_sections": [],
+      "source_file": "GHANA-EML-2017.pdf",
+      "source_url": "https://www.moh.gov.gh/wp-content/uploads/2020/07/GHANA-EML-2017.pdf",
+      "note": "Not a diagnostic guideline. Supports management AFTER a working diagnosis is established."
+    },
+    {
+      "document_id": "GH-IDSR",
+      "title": "Ghana Integrated Disease Surveillance and Response — Technical Guidelines",
+      "authority": "Ghana Health Service / Ministry of Health",
+      "edition": "First edition",
+      "publication_year": 2002,
+      "document_type": "national_surveillance_guideline",
+      "clinical_scope": "Epidemic-prone/notifiable conditions: meningitis, yellow fever, measles, cholera, VHF, ILI",
+      "status": "needs_supersession_check",
+      "effective_from": null,
+      "review_status": "possibly_outdated",
+      "superseded_sections": [],
+      "source_file": "Integrated-Disease-Surveillance-and-Response-Ghana-Guidelines.pdf",
+      "source_url": "https://moh.gov.gh/manuals-guidelines/",
+      "note": "Distinguish a SURVEILLANCE case definition from a CLINICAL diagnosis. Meeting a suspected-case definition does not confirm the disease. SUPERSESSION FLAG: this ingested PDF is the 2002 first edition (confirmed against Ghana MOH's own hosted copy). Published literature (Awoonor-Williams et al., BMC Public Health 2015) indicates Ghana revised its IDSR guidelines in 2011; the WHO/AFRO regional guidelines this was adapted from are now in a 3rd edition. Do not treat this as the current national guideline until a newer Ghana-specific edition has been located and compared — confirm with Ghana Health Service / the National Surveillance Unit before relying on this for the current priority-disease list or case definitions."
+    },
+    {
+      "document_id": "GH-LAB",
+      "title": "Ghana Laboratory Diagnostic Algorithms",
+      "authority": "Ghana Health Service / Ministry of Health",
+      "edition": "facility-approved",
+      "publication_year": null,
+      "document_type": "national_laboratory_guideline",
+      "clinical_scope": "Malaria RDT/microscopy, FBC, urinalysis, culture, TB/HIV tests, interpretation, critical values",
+      "status": "active_pending_confirmation",
+      "effective_from": null,
+      "review_status": "requires_periodic_review",
+      "superseded_sections": [],
+      "source_file": "GHANA-LAB-ALGORITHMS.pdf",
+      "source_url": null
+    }
+  ]
+}

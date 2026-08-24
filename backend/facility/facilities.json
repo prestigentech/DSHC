@@ -1,0 +1,60 @@
+{
+  "default": {
+    "facility_id": "GH-DEFAULT",
+    "facility_name": "District Hospital / Health Centre",
+    "facility_type": "all_levels",
+    "level_of_care": "B1",
+    "referral_facility": "Regional Hospital",
+    "tests": {
+      "malaria_rdt": true,
+      "microscopy": true,
+      "full_blood_count": true,
+      "urinalysis": true,
+      "blood_culture": false
+    }
+  },
+  "facilities": [
+    {
+      "facility_id": "GH-CHPS-01",
+      "facility_name": "CHPS Compound",
+      "facility_type": "chps",
+      "level_of_care": "A",
+      "referral_facility": "Sub-District Health Centre",
+      "tests": {
+        "malaria_rdt": true,
+        "microscopy": false,
+        "full_blood_count": false,
+        "urinalysis": true,
+        "blood_culture": false
+      }
+    },
+    {
+      "facility_id": "GH-HC-01",
+      "facility_name": "Health Centre",
+      "facility_type": "health_centre",
+      "level_of_care": "B1",
+      "referral_facility": "District Hospital",
+      "tests": {
+        "malaria_rdt": true,
+        "microscopy": true,
+        "full_blood_count": false,
+        "urinalysis": true,
+        "blood_culture": false
+      }
+    },
+    {
+      "facility_id": "GH-DH-01",
+      "facility_name": "District Hospital",
+      "facility_type": "district_hospital",
+      "level_of_care": "B2",
+      "referral_facility": "Regional Hospital",
+      "tests": {
+        "malaria_rdt": true,
+        "microscopy": true,
+        "full_blood_count": true,
+        "urinalysis": true,
+        "blood_culture": true
+      }
+    }
+  ]
+}

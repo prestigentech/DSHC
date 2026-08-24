@@ -1,0 +1,6 @@
+{
+  "name": "Ghana Febrile Illness Clinical Decision Support System",
+  "description": "Cognitively adaptive clinical decision support system utilizing Ghana Health Service guidelines and machine learning to guide diagnosis, testing, and personalized treatment of febrile cases across clinical cadres and facility levels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
