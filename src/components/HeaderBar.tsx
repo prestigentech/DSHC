@@ -1,7 +1,8 @@
 import React from 'react';
-import { CadreRole, ClinicalExpertise, FacilityLevel } from '../types';
+import { CadreRole, ClinicalExpertise, FacilityLevel, MainViewMode } from '../types';
 import { CASE_PRESETS } from '../data/casePresets';
 import { getRoleTheme } from '../utils/theme';
+import { DshcLogo } from './DshcLogo';
 import { 
   Building2, 
   Stethoscope, 
@@ -9,8 +10,14 @@ import {
   BookOpen, 
   Sliders, 
   RotateCcw,
-  AlertTriangle,
-  FolderOpen
+  Menu,
+  Moon,
+  Sun,
+  Type,
+  LayoutDashboard,
+  FolderOpen,
+  UserPlus,
+  Sparkles
 } from 'lucide-react';
 
 interface HeaderBarProps {
@@ -27,6 +34,14 @@ interface HeaderBarProps {
   onLoadPreset: (presetId: string) => void;
   onResetCase: () => void;
   hasRedFlags: boolean;
+  onToggleSidebar?: () => void;
+  activeView?: MainViewMode;
+  onSelectView?: (view: MainViewMode) => void;
+  onIncreaseFontSize?: () => void;
+  onDecreaseFontSize?: () => void;
+  onResetFontSize?: () => void;
+  darkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 export const HeaderBar: React.FC<HeaderBarProps> = ({
@@ -41,6 +56,14 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   onLoadPreset,
   onResetCase,
   hasRedFlags,
+  onToggleSidebar,
+  activeView = 'consultation',
+  onSelectView,
+  onIncreaseFontSize,
+  onDecreaseFontSize,
+  onResetFontSize,
+  darkMode,
+  onToggleDarkMode,
 }) => {
   const roleTheme = getRoleTheme(cadre);
 
@@ -52,53 +75,109 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
       {/* Top Primary Bar */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-2.5">
         <div className="flex items-center justify-between gap-2 sm:gap-3">
-          {/* Brand & Preset Section */}
+          
+          {/* Sidebar Menu + Brand */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
-            {/* Logo with dynamic role color */}
-            <div className={`w-8 h-8 rounded-lg ${roleTheme.primaryBg} flex items-center justify-center font-bold text-white shadow-xs text-xs sm:text-sm shrink-0 transition-colors duration-300`}>
-              GH
+            {onToggleSidebar && (
+              <button
+                onClick={onToggleSidebar}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                title="Toggle Sidebar Navigation"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* DSHC Official App Logo */}
+            <div 
+              onClick={() => onSelectView && onSelectView('dashboard')}
+              className="cursor-pointer hover:opacity-90 transition shrink-0"
+              title="DSHC - Decision Support in Healthcare"
+            >
+              <DshcLogo size="sm" variant="full" showSubtitle={true} className="hidden sm:inline-flex" />
+              <DshcLogo size="xs" variant="compact" showSubtitle={false} className="sm:hidden" />
             </div>
-            
-            {/* Title & Badge */}
-            <div className="min-w-0">
+
+            {/* Cadre Badge & Context */}
+            <div className="min-w-0 hidden xl:block border-l border-slate-200 pl-2.5">
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-slate-900 text-xs sm:text-sm tracking-tight whitespace-nowrap truncate">
-                  Ghana CDSS
-                </span>
-                <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border hidden sm:inline-block whitespace-nowrap ${roleTheme.primaryBadge}`}>
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border whitespace-nowrap ${roleTheme.primaryBadge}`}>
                   {roleTheme.title}
                 </span>
               </div>
-              <p className="text-slate-500 text-[10px] sm:text-[11px] hidden lg:block truncate">
-                Ghana Health Service Standard Treatment Guidelines (7th Ed)
+              <p className="text-slate-500 text-[10px] truncate">
+                Ghana Health Service (GHS) Guidelines
               </p>
             </div>
 
-            {/* Quick Case Benchmark Preset */}
-            <div className="relative hidden md:block max-w-[150px] lg:max-w-[190px]">
-              <select
-                id="case-preset-select"
-                onChange={(e) => {
-                  if (e.target.value) {
-                    onLoadPreset(e.target.value);
-                    e.target.value = '';
-                  }
-                }}
-                defaultValue=""
-                aria-label="Load preset clinical case"
-                className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 cursor-pointer font-medium truncate"
-              >
-                <option value="" disabled>Load Case Preset...</option>
-                {CASE_PRESETS.map((preset) => (
-                  <option key={preset.id} value={preset.id}>
-                    {preset.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Top View Selector Buttons */}
+            {onSelectView && (
+              <div className="hidden md:flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl text-xs font-bold ml-2">
+                <button
+                  onClick={() => onSelectView('consultation')}
+                  className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                    activeView === 'consultation' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Consultation</span>
+                </button>
+                <button
+                  onClick={() => onSelectView('dashboard')}
+                  className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                    activeView === 'dashboard' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  <span>Dashboard</span>
+                </button>
+                <button
+                  onClick={() => onSelectView('records')}
+                  className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                    activeView === 'records' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <FolderOpen className="w-3.5 h-3.5" />
+                  <span>Records</span>
+                </button>
+                <button
+                  onClick={() => onSelectView('adaptiveArchitecture')}
+                  className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                    activeView === 'adaptiveArchitecture' ? 'bg-cyan-800 text-white shadow-2xs' : 'text-cyan-800 hover:bg-cyan-50'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span className="hidden xl:inline">Adaptive Architecture</span>
+                  <span className="xl:hidden">Architecture</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Desktop/Tablet Direct Controls (Visible on lg+) */}
+          {/* Preset Cases Selector */}
+          <div className="relative hidden xl:block max-w-[170px]">
+            <select
+              id="case-preset-select"
+              onChange={(e) => {
+                if (e.target.value) {
+                  onLoadPreset(e.target.value);
+                  e.target.value = '';
+                }
+              }}
+              defaultValue=""
+              aria-label="Load preset clinical case"
+              className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs rounded-lg px-2.5 py-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 cursor-pointer font-medium truncate"
+            >
+              <option value="" disabled>Load Case Preset...</option>
+              {CASE_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Desktop Direct Controls */}
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             {/* Cadre Selector */}
             <div className="relative flex items-center">
@@ -158,8 +237,36 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             </button>
           </div>
 
-          {/* Action Buttons (Always accessible on right side) */}
+          {/* Action Buttons & Accessibility */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            
+            {/* Font Size Controls */}
+            {onIncreaseFontSize && (
+              <div className="hidden sm:flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 text-xs font-bold">
+                <button
+                  onClick={onDecreaseFontSize}
+                  className="px-1.5 py-0.5 hover:bg-white rounded text-slate-600"
+                  title="Decrease font size"
+                >
+                  A-
+                </button>
+                <button
+                  onClick={onResetFontSize}
+                  className="px-1.5 py-0.5 hover:bg-white rounded text-slate-600"
+                  title="Reset font size"
+                >
+                  ↺
+                </button>
+                <button
+                  onClick={onIncreaseFontSize}
+                  className="px-1.5 py-0.5 hover:bg-white rounded text-slate-600"
+                  title="Increase font size"
+                >
+                  A+
+                </button>
+              </div>
+            )}
+
             {/* Guidelines Assistant Drawer Button */}
             <button
               id="open-rag-search-btn"
@@ -195,102 +302,62 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           </div>
         </div>
 
-        {/* Responsive Secondary Context Bar (Active on mobile and tablets < lg) */}
+        {/* Responsive Secondary Context Bar (Mobile & small screens) */}
         <div className="lg:hidden mt-2 pt-2 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-          {/* Cadre Selector Mobile */}
-          <div className="relative flex items-center min-w-0">
-            <span className={`absolute left-2 pointer-events-none ${roleTheme.primaryText}`}>
-              <Stethoscope className="w-3 h-3" />
-            </span>
-            <select
-              id="cadre-select-mobile"
-              value={cadre}
-              onChange={(e) => setCadre(e.target.value as CadreRole)}
-              aria-label="Clinician cadre role"
-              className={`w-full bg-white ${roleTheme.primaryText} font-bold text-[11px] sm:text-xs rounded-lg pl-6 pr-2 py-1.5 border ${roleTheme.primaryLightBorder} focus:ring-1 focus:outline-none cursor-pointer truncate shadow-xs`}
-            >
-              <option value="Doctor">Doctor / MO</option>
-              <option value="Physician Assistant">Physician Assistant</option>
-              <option value="General Nurse">General Nurse</option>
-              <option value="Community Health Nurse">CHN (Community)</option>
-              <option value="Pharmacist">Pharmacist</option>
-            </select>
-          </div>
-
-          {/* Facility Tier Mobile */}
-          <div className="relative flex items-center min-w-0">
-            <span className="absolute left-2 pointer-events-none text-slate-500">
-              <Building2 className="w-3 h-3" />
-            </span>
-            <select
-              id="facility-level-select-mobile"
-              value={facilityLevel}
-              onChange={(e) => setFacilityLevel(e.target.value as FacilityLevel)}
-              aria-label="Facility level tier"
-              className="w-full bg-white text-slate-700 font-semibold text-[11px] sm:text-xs rounded-lg pl-6 pr-2 py-1.5 border border-slate-200 focus:ring-1 focus:outline-none cursor-pointer truncate shadow-xs"
-            >
-              <option value="District Hospital">Hospital</option>
-              <option value="Regional/Teaching Hospital">Regional Hosp</option>
-              <option value="Health Centre">Health Centre</option>
-              <option value="Clinic">Clinic</option>
-              <option value="Maternity Home">Maternity Home</option>
-              <option value="CHPS Compound">CHPS</option>
-              <option value="Community Pharmacy">Pharmacy</option>
-            </select>
-          </div>
-
-          {/* Mode Toggle Mobile */}
-          <button
-            id="toggle-time-pressure-btn-mobile"
-            onClick={() => setTimePressure(!timePressure)}
-            className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition border truncate shadow-xs ${
-              timePressure
-                ? 'bg-rose-50 text-rose-700 border-rose-300 ring-1 ring-rose-400 animate-pulse'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            }`}
-            title="Toggle between standard comprehensive evaluation and rapid triage mode"
+          <select
+            value={cadre}
+            onChange={(e) => setCadre(e.target.value as CadreRole)}
+            className="w-full bg-slate-50 text-slate-800 text-xs rounded-lg px-2 py-1.5 border border-slate-200 font-semibold"
           >
-            <Clock className="w-3 h-3 shrink-0" />
-            <span className="truncate">{timePressure ? 'Triage Mode' : 'Standard'}</span>
+            <option value="Doctor">Doctor</option>
+            <option value="Physician Assistant">PA</option>
+            <option value="General Nurse">Nurse</option>
+            <option value="Community Health Nurse">CHN</option>
+            <option value="Pharmacist">Pharm</option>
+          </select>
+
+          <select
+            value={facilityLevel}
+            onChange={(e) => setFacilityLevel(e.target.value as FacilityLevel)}
+            className="w-full bg-slate-50 text-slate-800 text-xs rounded-lg px-2 py-1.5 border border-slate-200 font-medium"
+          >
+            <option value="District Hospital">Hospital</option>
+            <option value="Regional/Teaching Hospital">Regional</option>
+            <option value="Health Centre">Health Centre</option>
+            <option value="Clinic">Clinic</option>
+            <option value="Maternity Home">Maternity</option>
+            <option value="CHPS Compound">CHPS</option>
+            <option value="Community Pharmacy">Pharmacy</option>
+          </select>
+
+          <button
+            onClick={() => setTimePressure(!timePressure)}
+            className={`w-full py-1.5 px-2 rounded-lg text-xs font-semibold border ${
+              timePressure ? 'bg-rose-50 text-rose-700 border-rose-300' : 'bg-slate-50 text-slate-700 border-slate-200'
+            }`}
+          >
+            {timePressure ? '⚡ Rapid Triage' : 'Standard'}
           </button>
 
-          {/* Preset Selector Mobile */}
-          <div className="relative flex items-center min-w-0">
-            <span className="absolute left-2 pointer-events-none text-slate-400">
-              <FolderOpen className="w-3 h-3" />
-            </span>
-            <select
-              id="case-preset-select-mobile"
-              onChange={(e) => {
-                if (e.target.value) {
-                  onLoadPreset(e.target.value);
-                  e.target.value = '';
-                }
-              }}
-              defaultValue=""
-              aria-label="Load preset clinical case"
-              className="w-full bg-white text-slate-700 text-[11px] sm:text-xs rounded-lg pl-6 pr-2 py-1.5 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 cursor-pointer font-medium truncate shadow-xs"
-            >
-              <option value="" disabled>Presets...</option>
-              {CASE_PRESETS.map((preset) => (
-                <option key={preset.id} value={preset.id}>
-                  {preset.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            onChange={(e) => {
+              if (e.target.value) {
+                onLoadPreset(e.target.value);
+                e.target.value = '';
+              }
+            }}
+            defaultValue=""
+            className="w-full bg-slate-50 text-slate-800 text-xs rounded-lg px-2 py-1.5 border border-slate-200 font-medium"
+          >
+            <option value="" disabled>Presets...</option>
+            {CASE_PRESETS.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.title}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
-
-      {/* Emergency Red Flag Notice Strip (Only visible when active red flags exist) */}
-      {hasRedFlags && (
-        <div className="bg-rose-50 text-rose-800 px-3 sm:px-4 py-1.5 border-t border-rose-200 flex items-center justify-between text-xs font-semibold">
-          <div className="flex items-center gap-2 max-w-7xl mx-auto w-full">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 animate-bounce" />
-            <span className="truncate sm:whitespace-normal">CRITICAL: High-risk danger signs or vital abnormalities detected — immediate action required.</span>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

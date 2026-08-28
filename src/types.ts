@@ -38,6 +38,31 @@ export interface HeFraEquipmentItem {
   referralOrAlternativeNote: string;
 }
 
+export type MainViewMode = 
+  | 'consultation' 
+  | 'dashboard' 
+  | 'records' 
+  | 'profile' 
+  | 'settings' 
+  | 'help' 
+  | 'privacy'
+  | 'admin'
+  | 'adaptiveArchitecture';
+
+export type DshcConsultationStep = 
+  | 'patientData' // Step 1
+  | 'vitals'      // Step 2
+  | 'planOfCare'  // Step 3
+  | 'counselling' // Step 3a
+  | 'history'     // Step 4
+  | 'symptoms'    // Step 4a (ROS)
+  | 'examination' // Step 5
+  | 'diagnosis'   // Step 6
+  | 'testing'     // Step 7
+  | 'testResults' // Step 8
+  | 'treatmentplan' // Step 9
+  | 'referral';   // Step 10
+
 export type DiagnosticStage = 
   | 'vitals' 
   | 'history' 
@@ -51,9 +76,14 @@ export type AVPU = 'Alert' | 'Voice' | 'Pain' | 'Unresponsive';
 export interface PatientProfile {
   id: string;
   name: string;
+  fullName?: string;
+  phone?: string;
+  nhisNo?: string;
+  patientId?: string;
+  dateOfBirth?: string;
   age: number;
   ageUnit: 'months' | 'years';
-  gender: 'Male' | 'Female';
+  gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say';
   weight: number; // in kg
   height?: number; // in cm
   muac?: number; // in cm (pediatric)
@@ -62,6 +92,11 @@ export interface PatientProfile {
   region: string;
   district: string;
   community: string;
+  address?: string;
+  occupation?: string;
+  maritalStatus?: string;
+  relativeName?: string;
+  relativeContact?: string;
 }
 
 export interface VitalsData {
@@ -70,7 +105,11 @@ export interface VitalsData {
   rr: number; // in bpm
   bpSystolic?: number; // mmHg
   bpDiastolic?: number; // mmHg
+  bloodPressure?: string;
   spo2: number; // %
+  height?: number; // cm
+  weight?: number; // kg
+  bmi?: number;
   avpu: AVPU;
   capillaryRefillSeconds: number;
   unconsciousOrLethargic: boolean;
@@ -101,11 +140,22 @@ export interface HistoryData {
   travelHistory: string;
   miningOrGalamseyOrForestExposure: boolean;
   floodOrStagnantWaterContact: boolean;
-  priorAntimalarialTaken: string; // e.g. "None", "AL 1 dose", "Herbal"
+  priorAntimalarialTaken: string;
   priorAntibioticsTaken: string;
   priorAntipyretics: string;
   immunizationUpToDate: boolean;
   notes: string;
+  // DSHC specific narrative fields
+  presentingComplaints?: string;
+  historyOfComplaints?: string;
+  odq?: string;
+  pastMedical?: string;
+  surgicalHx?: string;
+  familyHx?: string;
+  allergies?: string;
+  socialHx?: string;
+  // Visual ROS selected symptoms
+  selectedSymptoms?: string[];
 }
 
 export interface ExaminationData {
@@ -128,17 +178,26 @@ export interface ExaminationData {
   pedalEdema: boolean;
   lymphadenopathy: boolean;
   tonsillarExudates: boolean;
+  generalNotes?: string;
+  systematicFindings?: {
+    respiratory?: string[];
+    cardiovascular?: string[];
+    neurological?: string[];
+    ent?: string[];
+    msk?: string[];
+    abdomen?: string[];
+  };
 }
 
 export interface DiagnosticTestsData {
   mrdtPf: 'Not Done' | 'Positive' | 'Negative' | 'Invalid';
   mrdtPan: 'Not Done' | 'Positive' | 'Negative';
   pregnancyTest?: 'Not Done' | 'Positive' | 'Negative';
-  microscopyParasiteDensity?: string; // e.g. "25,000 parasites/uL" or "Negative"
-  fbcWbc?: number; // x 10^9 / L
-  fbcHb?: number; // g/dL
-  fbcPlatelets?: number; // x 10^9 / L
-  randomBloodGlucose?: number; // mmol/L
+  microscopyParasiteDensity?: string;
+  fbcWbc?: number;
+  fbcHb?: number;
+  fbcPlatelets?: number;
+  randomBloodGlucose?: number;
   urineDipstickLeukocytes?: 'Negative' | 'Trace' | '+' | '++' | '+++';
   urineDipstickNitrites?: 'Negative' | 'Positive';
   bloodCulture?: 'Not Done' | 'Pending' | 'Salmonella typhi' | 'Staph aureus' | 'Streptococcus pneumoniae' | 'No growth';
@@ -214,7 +273,7 @@ export interface RedFlagAlert {
 }
 
 export interface CognitiveBiasAlert {
-  biasType: string; // e.g. "Anchoring Bias", "Premature Closure", "Availability Bias", "Confirmation Bias"
+  biasType: string;
   warningText: string;
   clinicalEvidence: string;
   mitigationTip: string;
@@ -362,7 +421,6 @@ export interface DecisionSupportOutput {
   managementPlan: ManagementPlan;
   cadreSpecificAdvice: string;
   cognitiveSummaryText: string;
-  // DRM Cadre-Specific Adaptive Intelligence
   cognitiveBiases?: CognitiveBiasAlert[];
   pharmacyTriage?: PharmacyTriageAssessment;
   nurseTriage?: NurseTriageStatus;
@@ -384,3 +442,224 @@ export interface ClinicalCasePreset {
   tests: DiagnosticTestsData;
   learningFocus: string;
 }
+
+export interface EncounterRecord {
+  id: string;
+  createdAt: string;
+  completedAt?: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'referred';
+  doctorName?: string;
+  doctorEmail?: string;
+  staffId?: string;
+  facilityName?: string;
+  facilityLevel?: FacilityLevel;
+  cadre?: CadreRole;
+  pageStates: {
+    patient_info?: PatientProfile;
+    dshc_patient_info?: PatientProfile;
+    vitals?: VitalsData;
+    dshc_vitals?: VitalsData;
+    history?: HistoryData;
+    dshc_symptoms?: HistoryData;
+    symptoms?: any;
+    examination?: ExaminationData;
+    dshc_examination?: ExaminationData;
+    diagnosis?: any;
+    dshc_diagnosis?: any;
+    treatment_plan?: any;
+    dshc_treatment_plan?: any;
+    counselling?: any;
+    referral?: any;
+    dshc_referral?: any;
+  };
+}
+
+// ==========================================
+// RAG-BASED ADAPTIVE UI ARCHITECTURE TYPES
+// 6-Layer HCI Framework
+// ==========================================
+
+// Layer 1: User Context Layer
+export interface UserContextLayerState {
+  role: CadreRole;
+  clinicalExperience: 'Novice' | 'Mid-level' | 'Expert';
+  currentTask: DshcConsultationStep | 'triage' | 'differential' | 'testing' | 'dispensing' | 'referral' | 'counselling';
+  patientCondition: {
+    acuity: 'NORMAL' | 'URGENT' | 'CRITICAL_EMERGENCY';
+    ageGroup: 'Neonate' | 'Infant' | 'ChildUnder5' | 'Adolescent' | 'Adult' | 'Elderly';
+    isPregnant: boolean;
+    hasComorbidities: boolean;
+    comorbidityLabels: string[];
+    feverState: 'Afebrile' | 'ModerateFever' | 'HighFever' | 'Hyperpyrexia';
+    dangerSignsPresent: string[];
+  };
+  facilityCharacteristics: {
+    facilityLevel: FacilityLevel;
+    hasElectricity: boolean;
+    hasColdChain: boolean;
+    hasMicroscopy: boolean;
+    hasPocRdt: boolean;
+    hasOxygen: boolean;
+    hasIvArtesunate: boolean;
+    referralDistanceKm: number;
+    resourceTier: 'CHPS' | 'PrimaryHealthCentre' | 'DistrictHospital' | 'Tertiary';
+  };
+}
+
+// Layer 2: Knowledge Repository Models (HTA & DRM)
+export interface HTASubtask {
+  id: string;
+  title: string;
+  description: string;
+  isDecisionPoint: boolean;
+  requiredForRoles: CadreRole[];
+  cognitiveLoad: 'Low' | 'Medium' | 'High';
+  adaptationOpportunity: string;
+}
+
+export interface HTATaskNode {
+  id: string;
+  taskNumber: string;
+  name: string;
+  category: 'Triage' | 'History & ROS' | 'Physical Exam' | 'Diagnostic Testing' | 'Treatment & Dosing' | 'Referral & Transport';
+  description: string;
+  parentTaskId?: string;
+  subtasks: HTASubtask[];
+  decisionCriteria: string[];
+  rolePermissions: Record<CadreRole, 'Primary' | 'Secondary' | 'Excluded'>;
+}
+
+// Cadre-Specific HTA Diagram Structures (Doctor, General Nurse, CHN, Pharmacist, PA)
+export interface CadreHTANode {
+  code: string;
+  name: string;
+  plan?: string;
+  condition?: string;
+  isDecisionBranch?: boolean;
+  type?: 'task' | 'decision' | 'triage' | 'leaf' | 'input_artifact' | 'action';
+  annotations?: string[];
+  cognitiveLoad?: 'Low' | 'Medium' | 'High';
+  clinicalRationale?: string;
+  stgGuidelineLink?: string;
+  children?: CadreHTANode[];
+}
+
+export interface CadreHTABranch {
+  stepNumber: string;
+  name: string;
+  planDescription: string;
+  conditionNotes?: string;
+  isDecisionBranch?: boolean;
+  inputArtifacts?: string[];
+  nodes: CadreHTANode[];
+}
+
+export interface CadreHTATree {
+  role: CadreRole;
+  cadreKey: 'doctor' | 'general_nurse' | 'chn' | 'pharmacist' | 'physician_assistant';
+  title: string;
+  goal: string;
+  rootPlan: string;
+  contextSummary: string;
+  practiceSetting: string;
+  decisionAutonomy: 'Independent Specialist' | 'Primary Clinical Provider' | 'Protocolized Triage & Care' | 'Community Screening' | 'Medication Therapy Expert';
+  branches: CadreHTABranch[];
+  keyDifferences: string[];
+}
+
+export interface DecisionRequirementEntry {
+  id: string;
+  clinicalTask: string;
+  informationNeeds: string[];
+  userRoles: CadreRole[];
+  contextualFactors: string[];
+  adaptationTriggers: string[];
+  cognitiveSupportMechanisms: string[];
+  uiOutputStrategy: string;
+}
+
+// Layer 3: Retrieval Layer
+export interface VectorRetrievalQuery {
+  role: CadreRole;
+  task: string;
+  workflowStep: DshcConsultationStep;
+  acuity: string;
+  facilityLevel: FacilityLevel;
+  keywords: string[];
+}
+
+export interface SemanticRetrievalResult {
+  chunkId: string;
+  title: string;
+  category: 'HTA_WORKFLOW' | 'DECISION_REQUIREMENT' | 'CLINICAL_GUIDELINE' | 'ADAPTATION_RULE';
+  similarityScore: number; // 0.00 to 1.00
+  matchedTokens: string[];
+  relevanceRationale: string;
+  content: string;
+}
+
+// Layer 4 & 5: Generation & Adaptive Interface Layer
+export interface AdaptiveComponentSpec {
+  componentId: string;
+  componentType: 'Dashboard' | 'DiagnosticPanel' | 'AlertBanner' | 'RecommendationCard' | 'DataVisualization' | 'NavigationElement' | 'DosageCalculator';
+  title: string;
+  priorityOrder: number; // 1 = top priority
+  isExpandedByDefault: boolean;
+  visibilityRule: 'SHOW_ALWAYS' | 'SHOW_IF_URGENT' | 'ROLE_RESTRICTED' | 'NOVICE_ONLY' | 'COLLAPSED_FOR_EXPERT';
+  targetRole: CadreRole[];
+  layoutGridSpan: 'col-span-12' | 'col-span-8' | 'col-span-6' | 'col-span-4';
+  visualWeight: 'CRITICAL_ALARM' | 'HIGHLIGHT' | 'STANDARD' | 'MINIMAL_SECONDARY';
+  dynamicContent: {
+    headline: string;
+    actionableDirectives: string[];
+    guidelineCitations: string[];
+    metricsOrValues?: Record<string, any>;
+    customBadge?: string;
+  };
+}
+
+export interface DynamicUISpecification {
+  generatedAt: string;
+  generatorEngine: 'Claude-3.7-Sonnet' | 'Gemini-3.7-Flash' | 'Deterministic-Ghana-STG-Engine';
+  targetRole: CadreRole;
+  experienceMode: 'Guided-Novice' | 'HighDensity-Expert';
+  layoutArchetype: 'Triage-First-Emergency' | 'Prescription-Dispensing-Focus' | 'Community-Pictorial-Screening' | 'Comprehensive-Differential-Tree';
+  cognitiveLoadTarget: 'Streamlined' | 'Balanced' | 'Comprehensive';
+  activeAlerts: {
+    id: string;
+    level: 'CRITICAL' | 'WARNING' | 'INFO';
+    message: string;
+    actionLabel: string;
+  }[];
+  components: AdaptiveComponentSpec[];
+  workflowSequence: {
+    step: DshcConsultationStep;
+    label: string;
+    isPriority: boolean;
+    badgeNote?: string;
+  }[];
+}
+
+// Layer 6: Feedback & Learning Layer
+export interface InteractionFeedbackLog {
+  id: string;
+  timestamp: string;
+  role: CadreRole;
+  task: DshcConsultationStep;
+  interactionType: 'LAYOUT_OVERRIDE' | 'COMPONENT_EXPAND' | 'RECOMMENDATION_ACCEPTED' | 'RECOMMENDATION_OVERRIDDEN' | 'TIME_ON_STEP_RECORDED' | 'GUIDELINE_ACCESSED';
+  timeSpentSeconds: number;
+  acceptedGuideline: boolean;
+  clinicianRating?: number; // 1 to 5
+  overrideReason?: string;
+  adaptedLayoutId: string;
+}
+
+export interface AdaptiveFeedbackMetrics {
+  totalInteractionsLogged: number;
+  guidelineAcceptanceRate: number; // Percentage 0-100
+  averageTimeReductionPercent: number; // e.g. 34%
+  roleAcceptanceRates: Record<CadreRole, number>;
+  mostOverriddenComponents: string[];
+  cognitiveLoadRatingAverage: number; // 1-5
+}
+
